@@ -1,15 +1,15 @@
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
-  name: k8sazurepodenforcelabels
+  name: k8sazuredeploymentenforcelabels
 spec:
   crd:
     spec:
       names:
-        kind: K8sAzurePodEnforceLabels
-        listKind: K8sAzurePodEnforceLabelsList
-        plural: k8sazurepodenforcelabels
-        singular: k8sazurepodenforcelabels
+        kind: K8sAzureDeploymentEnforceLabels
+        listKind: K8sAzureDeploymentEnforceLabelsList
+        plural: k8sazuredeploymentenforcelabels
+        singular: k8sazuredeploymentenforcelabels
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
@@ -21,12 +21,12 @@ spec:
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
-        package k8sazurepodenforcelabels
+        package k8sazuredeploymentenforcelabels
 
         violation[{"msg": msg, "details": {"missing_labels": missing}}] {
           required := {label | label := input.parameters.labels[_]}
           provided := {label | input.review.object.metadata.labels[label]}
           missing := required - provided
           count(missing) > 0
-          msg := sprintf("you must provide labels: %v", [missing])
+          msg := sprintf("you must provide labels for deployment: %v", [missing])
         }
